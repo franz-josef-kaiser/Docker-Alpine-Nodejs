@@ -18,4 +18,4 @@ branches:
     only:
         - master
 
-script: "bundle exec rspec -f p tests/Dockspec.rb"
+script: "bundle exec rspec --format documentation tests/Dockspec.rb"
