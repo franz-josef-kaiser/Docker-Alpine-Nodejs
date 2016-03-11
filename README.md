@@ -144,3 +144,6 @@ quick look at [CONTRIBUTING](CONTRIBUTING.md) - you will not find any surprises 
  there should be a non privileged `node` user in place. See uncommented parts of the [`Dockerfile`](Dockerfile)
  * Maybe there should be an [`ENTRYPOINT`](docker-entrypoint.sh) in place to pass commands directly 
  to `npm` and avoid fiddling with `node`.
+ * The file removal after the installation of NPM could be much easier and just set a whitelist.
+ That would also mean that it's more versatile regarding the folder structure of various versions.
+ Also we need to check the folder structure first and maybe switch the whitelist depending on the version.

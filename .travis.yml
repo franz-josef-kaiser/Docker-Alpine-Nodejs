@@ -1,0 +1,21 @@
+---
+language: ruby
+
+cache:
+    bundler: true
+
+sudo: false
+
+rvm:
+    - 2.3.0
+
+gemfile: tests/Gemfile.ci
+
+services:
+    - docker
+
+branches:
+    only:
+        - master
+
+script: "rspec -f p tests/rspec.rb"
