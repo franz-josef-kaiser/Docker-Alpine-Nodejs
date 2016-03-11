@@ -47,7 +47,8 @@ ENV PACKAGES "binutils-gold \
 	libgcc \
 	libstdc++ \
 	linux-headers \
-	make paxctl \
+	make \
+	paxctl \
 	python \
 	${ADDT_PACKAGES}"
 
