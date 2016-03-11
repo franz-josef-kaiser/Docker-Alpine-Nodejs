@@ -1,10 +1,10 @@
 ---
 language: ruby
 
+sudo: required
+
 cache:
     - bundler
-
-sudo: false
 
 rvm:
     - 2.3.0
