@@ -1,0 +1,6 @@
+# IDEs
+/.idea
+
+# Nodejs/NPM
+/node_modules
+npm-debug.log

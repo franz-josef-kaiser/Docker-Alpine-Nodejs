@@ -38,7 +38,37 @@ ENV NODE_PATH "${HOME}/.node_modules:${HOME}/.node_libraries:${TARGET}"
 # Custom, user defined runtime packages, allowing for extensions
 ARG ADDT_PACKAGES
 # Concatenated package list
-ENV PACKAGES "bash binutils-gold ca-certificates curl g++ gcc gnupg libgcc libstdc++ linux-headers make paxctl python ${ADDT_PACKAGES}"
+ENV PACKAGES "binutils-gold \
+	ca-certificates \
+	curl \
+	g++ \
+	gcc \
+	gnupg \
+	libgcc \
+	libstdc++ \
+	linux-headers \
+	make paxctl \
+	python \
+	${ADDT_PACKAGES}"
+
+ENV GPG_KEYS 9554F04D7259F04124DE6B476D5A82AC7E37093B \
+		94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
+		0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
+		FD3A5288F042B6850C66B31F09FE44734EB7990E \
+		71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
+		DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
+		C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
+		B9AE9905FFD7803F25714661B63B535A4C206CA9 \
+		93C7E9E91B49E432C2F75674B0A78B0A6C481CF6 \
+		114F43EE0176B71C7BC219DD50A3051F888C628D \
+		7937DFD2AB06298B2293C3187D33FF9D0246406D
+
+# Add Gnu Privacy Guard keys, check fingerprint
+RUN set -xe \
+	&& for key in ${GPG_KEYS}; do \
+		gpg --keyserver pool.sks-keyservers.net --recv-keys "${key}"; \
+		gpg --fingerprint "${key}"; \
+	done
 
 WORKDIR "${TARGET}"
 
@@ -53,32 +83,10 @@ WORKDIR "${TARGET}"
 RUN apk update \
 	&& apk add --upgrade --no-cache ${PACKAGES} \
 	&& update-ca-certificates --fresh \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys 9554F04D7259F04124DE6B476D5A82AC7E37093B \
-	&& gpg --fingerprint 9554F04D7259F04124DE6B476D5A82AC7E37093B \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys 94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
-	&& gpg --fingerprint 94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys 0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
-	&& gpg --fingerprint 0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys FD3A5288F042B6850C66B31F09FE44734EB7990E \
-	&& gpg --fingerprint FD3A5288F042B6850C66B31F09FE44734EB7990E \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys 71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
-	&& gpg --fingerprint 71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
-	&& gpg --fingerprint DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
-	&& gpg --fingerprint C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys B9AE9905FFD7803F25714661B63B535A4C206CA9 \
-	&& gpg --fingerprint B9AE9905FFD7803F25714661B63B535A4C206CA9 \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys 93C7E9E91B49E432C2F75674B0A78B0A6C481CF6 \
-	&& gpg --fingerprint 93C7E9E91B49E432C2F75674B0A78B0A6C481CF6 \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys 114F43EE0176B71C7BC219DD50A3051F888C628D \
-	&& gpg --fingerprint 114F43EE0176B71C7BC219DD50A3051F888C628D \
-	&& gpg --keyserver pool.sks-keyservers.net --recv-keys 7937DFD2AB06298B2293C3187D33FF9D0246406D \
-	&& gpg --fingerprint 7937DFD2AB06298B2293C3187D33FF9D0246406D \
 	&& echo " ---> Downloading Node.js tarball" \
-	&& curl --tlsv1.2 -sSOL "https://nodejs.org/dist/v${VERSION}/node-v${VERSION}.tar.gz" \
-	&& curl --tlsv1.2 -sSOL "https://nodejs.org/dist/v${VERSION}/SHASUMS256.txt.asc" \
-	&& curl --tlsv1.2 -sSOL "https://nodejs.org/dist/v${VERSION}/SHASUMS256.txt" \
+	&& curl --tlsv1.2 -fsSOL "https://nodejs.org/dist/v${VERSION}/node-v${VERSION}.tar.gz" \
+	&& curl --tlsv1.2 -fsSOL "https://nodejs.org/dist/v${VERSION}/SHASUMS256.txt.asc" \
+	&& curl --tlsv1.2 -fsSOL "https://nodejs.org/dist/v${VERSION}/SHASUMS256.txt" \
 	&& echo " ---> Verifying build" \
 	&& gpg --verify -a SHASUMS256.txt.asc \
 	&& grep "node-v${VERSION}.tar.gz" SHASUMS256.txt.asc \
@@ -100,9 +108,17 @@ RUN apk update \
 	&& echo " ---> Cleaning up" \
 	&& cd .. \
 	&& apk del ${PACKAGES} \
-	&& apk -v cache clean \
 	&& rm SHASUMS256.tx* \
-	&& rm node-v${VERSION}.tar.gz \
+	&& rm "node-v${VERSION}.tar.gz" \
+		/usr/lib/node_modules/npm/AUTHORS \
+		/usr/lib/node_modules/npm/*.md \
+		/usr/lib/node_modules/npm/LICENSE \
+		/usr/lib/node_modules/npm/configure \
+		/usr/lib/node_modules/npm/make.bat \
+		/usr/lib/node_modules/npm/Makefile \
+		/usr/lib/node_modules/npm/.mailmap \
+		/usr/lib/node_modules/npm/.npmignore \
+		/usr/lib/node_modules/npm/.travis.yml \
 	&& rm -rf /etc/ssl \
 		node-v${VERSION} \
 		/usr/include \
@@ -113,6 +129,8 @@ RUN apk update \
 		/root/.node-gyp \
 		/usr/lib/node_modules/npm/man \
 		/usr/lib/node_modules/npm/doc \
+		/usr/lib/node_modules/npm/changelog \
+		/usr/lib/node_modules/npm/scripts \
 		/usr/lib/node_modules/npm/html
 
 # && curl -L https://npmjs.org/install.sh | sh \
