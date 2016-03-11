@@ -2,7 +2,7 @@
 language: ruby
 
 cache:
-    bundler: true
+    - bundler
 
 sudo: false
 
