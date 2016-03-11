@@ -18,4 +18,4 @@ branches:
     only:
         - master
 
-script: "rspec -f p tests/rspec.rb"
+script: "bundle exec rspec -f p tests/rspec.rb"
