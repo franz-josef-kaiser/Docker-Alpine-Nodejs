@@ -12,10 +12,8 @@ rvm:
 gemfile: tests/Gemfile.ci
 
 env:
-  - DOCKER_VERSION=1.6.2
-  - DOCKER_VERSION=1.7.1
-  - DOCKER_VERSION=1.8.3
   - DOCKER_VERSION=1.9.1
+  - DOCKER_VERSION=1.10.2
 
 services:
     - docker
