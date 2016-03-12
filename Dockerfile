@@ -64,26 +64,31 @@ ENV GPG_KEYS 9554F04D7259F04124DE6B476D5A82AC7E37093B \
 		114F43EE0176B71C7BC219DD50A3051F888C628D \
 		7937DFD2AB06298B2293C3187D33FF9D0246406D
 
-# Add Gnu Privacy Guard keys, check fingerprint
-RUN set -xe \
-	&& for key in ${GPG_KEYS}; do \
-		gpg --keyserver pool.sks-keyservers.net --recv-keys "${key}"; \
-		gpg --fingerprint "${key}"; \
-	done
+#RUN set -xe \
+#	&& for key in ${GPG_KEYS}; do \
+#		gpg --keyserver pool.sks-keyservers.net --recv-keys "${key}"; \
+#		gpg --fingerprint "${key}"; \
+#	done
 
 WORKDIR "${TARGET}"
 
 # 1. Add APK packages, Update certs, Add keys to verify the validity of the side-loaded Node.js tarball
 #    The keys contain the ones of three older Node.js maintainers as well to verify older versions integrity
 #    Verify .asc key file first, then verify tarball, then untar when everything went well
-# 2. Build Nodejs using Gnu C Compiler/gcc ia Make using max available amount of CPUs, default to 1
+# 2. Add Gnu Privacy Guard keys, check fingerprint
+# 3. Build Nodejs using Gnu C Compiler/gcc ia Make using max available amount of CPUs, default to 1
 #    Node.js needs to execute arbitrary code at runtime. Permit this by disabling mprotect: Grsecurity + paxctl.
-# 3. Test the Node.js build and finished installation, Install NPM globally - if requested
-# 4. Finally install NPM on demand.
-# 5. Clean up temporary files, packages that aren't needed anymore, Remove Man pages, etc.
+# 4. Test the Node.js build and finished installation, Install NPM globally - if requested
+# 5. Finally install NPM on demand.
+# 6. Clean up temporary files, packages that aren't needed anymore, Remove Man pages, etc.
 RUN apk update \
 	&& apk add --upgrade --no-cache ${PACKAGES} \
 	&& update-ca-certificates --fresh \
+	&& set -xe \
+	&& for key in ${GPG_KEYS}; do \
+			gpg --keyserver pool.sks-keyservers.net --recv-keys "${key}"; \
+			gpg --fingerprint "${key}"; \
+		done \
 	&& echo " ---> Downloading Node.js tarball" \
 	&& curl --tlsv1.2 -fsSOL "https://nodejs.org/dist/v${VERSION}/node-v${VERSION}.tar.gz" \
 	&& curl --tlsv1.2 -fsSOL "https://nodejs.org/dist/v${VERSION}/SHASUMS256.txt.asc" \

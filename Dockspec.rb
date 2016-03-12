@@ -6,7 +6,7 @@ describe "Dockerfile" do
 		print "Running Tests for Docker\n"
 		print " ---> Docker Version " + Docker.version["Version"] + "\n\n"
 
-		@image = Docker::Image.build_from_dir( ".." )
+		@image = Docker::Image.build_from_dir( "." )
 
 		set :os, family: :alpine
 		set :backend, :docker

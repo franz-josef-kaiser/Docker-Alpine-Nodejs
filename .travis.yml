@@ -9,7 +9,7 @@ cache:
 rvm:
     - 2.3.0
 
-gemfile: tests/Gemfile.ci
+gemfile: ./ci/Gemfile.ci
 
 env:
   - DOCKER_VERSION=1.9.1
@@ -22,10 +22,10 @@ branches:
     only:
         - master
 
-before_install: ./tests/install_dependencies.sh
+before_install: ./ci/install_dependencies.sh
 
 before_script:
     - export PATH=/opt/docker:$PATH
     - docker version
 
-script: "bundle exec rspec tests/Dockspec.rb"
+script: "bundle exec rspec ./Dockspec.rb"
