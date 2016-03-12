@@ -64,12 +64,6 @@ ENV GPG_KEYS 9554F04D7259F04124DE6B476D5A82AC7E37093B \
 		114F43EE0176B71C7BC219DD50A3051F888C628D \
 		7937DFD2AB06298B2293C3187D33FF9D0246406D
 
-#RUN set -xe \
-#	&& for key in ${GPG_KEYS}; do \
-#		gpg --keyserver pool.sks-keyservers.net --recv-keys "${key}"; \
-#		gpg --fingerprint "${key}"; \
-#	done
-
 WORKDIR "${TARGET}"
 
 # 1. Add APK packages, Update certs, Add keys to verify the validity of the side-loaded Node.js tarball

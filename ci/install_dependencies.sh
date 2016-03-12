@@ -18,7 +18,7 @@ for x in {1..3}
 do
     [[ $running != 1 ]] || break
     sudo rm -rf /var/run/docker.pid
-    sudo /opt/docker/docker daemon -D &
+    sudo /opt/docker/docker -d -D &
     DOCKER_PID=$!
     sleep 5
     echo "Checking if docker is running"

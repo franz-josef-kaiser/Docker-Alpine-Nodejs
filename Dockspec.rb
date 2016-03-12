@@ -10,7 +10,7 @@ describe "Dockerfile" do
 
 		set :os, family: :alpine
 		set :backend, :docker
-		set :docker_image, image.id
+		set :docker_image, @image.id
 
 		@container = Docker::Container.create(
 			'Image' => @image.id,
