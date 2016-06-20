@@ -2,6 +2,7 @@ require "serverspec"
 require "docker"
 
 describe "Dockerfile" do
+
 	before( :all ) do
 		print "Running Tests for Docker\n"
 		print " ---> Docker Version " + Docker.version["Version"] + "\n\n"
@@ -68,4 +69,5 @@ describe "Dockerfile" do
 	def os_version
 		command( "identify_alpine()" ).stdout
 	end
+
 end

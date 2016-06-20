@@ -88,12 +88,45 @@ services:
         tty: true
 
 volumes:
-	…
+	nodeapp:
 
 networks:
     front:
         driver: bridge
 ```
+
+You can then check your attached volume:
+
+```shell
+$ docker volume ls
+local    projectname_nodeapp
+```
+
+In case you need to remove your volume container:
+
+```shell
+docker volume rm $(docker volume ls |awk '{print $2}')
+```
+
+Details about the volume are then available via:
+
+```shell
+docker volume inspect <volume_name>
+
+# Example:
+$ docker volume inspect projectname_nodeapp
+
+[
+    {
+        "Name"       : "projectname_nodeapp",
+        "Driver"     : "local",
+        "Mountpoint" : "/mnt/sda1/var/lib/docker/volumes/projectname_nodeapp/_data"
+    }
+]
+```
+
+**Sidenote:** You might want to `docker-compose down` your Nodejs service 
+to get a fresh start before going to create volumes.
 
 ### FAQ
 
@@ -126,6 +159,34 @@ when trying to build the image.
 **A:** You should define all build arguments as _strings_. Do not set `--build-arg NPM=true`, but 
 use `--build-arg NPM="true"` (or better: `yes`) instead to avoid using a _real_ boolen. 
 The same has to be done when using _Docker Compose_. Set `build: args: NPM: "yes"` as _string_.
+
+## Tests
+
+Currently there are acceptance tests shipped with this package. The specs 
+are run using Ruby and the following Gems:
+
+ * [rspec](https://rubygems.org/gems/rspec)
+ * [serverspec](https://rubygems.org/gems/serverspec)
+ * [docker-api](https://rubygems.org/gems/docker-api)
+
+To run tests, you need Ruby and the listed Gems installed. The test can 
+be run on the command line:
+
+```shell
+$ Print progress bar/dots while running tests
+$ rspec --format progress Dockspec.rb
+# Short notation
+$ rspec -f p Dockspec.rb
+# Verbose output (Print spec titles) while running tests
+$ rspec --format documentation Dockspec.rb
+# Short notation
+$ rspec -f d Dockspec.rb
+```
+
+The _docker-api_ Gem will remote execute Docker, which means that the test run 
+is a real world test and will fully expose things that might go wrong.
+
+**OS X** and **Windows** users will have to run the tests inside their Docker Machine.
 
 ## TO-DO
 
