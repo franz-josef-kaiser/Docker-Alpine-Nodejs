@@ -1,0 +1,13 @@
+# VCS
+.github/*
+.gitignore
+
+# Tests
+ci/*
+.rspec
+.travis.yml
+Dockspec.rb
+
+# Docs
+README.md
+LICENSE
