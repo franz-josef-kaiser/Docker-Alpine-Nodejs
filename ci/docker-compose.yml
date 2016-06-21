@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+    nodejs:
+        container_name: nodejs
+        build:
+            context: ./Docker/Nodejs
+            args:
+                VERSION: "5.6.0"
+                NPM_VERSION: "3"
+                NPM: "yes"
+                PREFIX: "/usr"
+                TARGET: "/src/app"
+                SRC: "./app/node"
+        restart: on-failure:3
+        expose:
+            - "3000"
+        depends_on:
+            - nodeapp
+        volumes_from:
+            - nodeapp
+        command: [ "node", "server.js" ]
+        #command: npm install --force --loglevel=error
+        networks:
+            - front
+        tty: true
+
+    nodeapp:
+        container_name: nodeapp
+        image: busybox:latest
+        volumes:
+            - ./app/node:/usr/src/app
+        networks:
+            - front
+        tty: true
+
+volumes:
+	nodeapp:
+
+networks:
+    front:
+        driver: bridge

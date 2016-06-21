@@ -22,6 +22,8 @@ ENV PREFIX ${PREFIX:-/usr}
 # Do not use `--fully-static` with Alpine Linux
 # as it might have problems with musl (and glibc) and loading compiled modules
 # @link https://github.com/nodejs/node-v0.x-archive/wiki/statically-linked-executable
+# As Docker denies usage of any modifier aside from `:` followed by `+|-`,
+# replacement of `--fully-static` happens upon usage of ${FLAGS}
 ARG FLAGS
 ENV FLAGS ${FLAGS:-}
 
@@ -34,9 +36,6 @@ ENV SRC ${SRC:-./app}
 # Here for historical reasons only
 ENV NODE_PATH "${HOME}/.node_modules:${HOME}/.node_libraries:${TARGET}"
 
-# Alpine APK registry packages
-# Custom, user defined runtime packages, allowing for extensions
-ARG ADDT_PACKAGES
 # Concatenated package list
 ENV PACKAGES "binutils-gold \
 	ca-certificates \
@@ -44,12 +43,17 @@ ENV PACKAGES "binutils-gold \
 	g++ \
 	gcc \
 	gnupg \
-	libgcc \
-	libstdc++ \
 	linux-headers \
 	make \
 	paxctl \
-	python \
+	python"
+
+# Alpine APK registry packages
+# Custom, user defined runtime packages, allowing for extensions
+ARG ADDT_PACKAGES
+# Packages mandatory to run Nodejs
+ENV DEPS_PACKAGES "libgcc \
+	libstdc++ \
 	${ADDT_PACKAGES}"
 
 ENV GPG_KEYS 9554F04D7259F04124DE6B476D5A82AC7E37093B \
@@ -76,7 +80,7 @@ WORKDIR "${TARGET}"
 # 5. Finally install NPM on demand.
 # 6. Clean up temporary files, packages that aren't needed anymore, Remove Man pages, etc.
 RUN apk update \
-	&& apk add --upgrade --no-cache ${PACKAGES} \
+	&& apk add --upgrade --no-cache ${PACKAGES} ${DEPS_PACKAGES} \
 	&& update-ca-certificates --fresh \
 	&& set -xe \
 	&& for key in ${GPG_KEYS}; do \
@@ -94,7 +98,9 @@ RUN apk update \
 	&& tar xzf "node-v${VERSION}.tar.gz" \
 	&& cd "node-v${VERSION}" \
 	&& echo " ---> Compiling Node.js with flags: ${FLAGS} --prefix=${PREFIX}" \
-	&& ./configure ${FLAGS} --prefix=${PREFIX} $([[ -z "${NPM+yes}" ]] && echo "--without-npm") \
+	&& ./configure \
+		${FLAGS//--fully-static/} \
+		--prefix=${PREFIX} $([[ -z "${NPM+yes}" ]] && echo "--without-npm") \
 	&& make -j$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) \
 	&& make install \
 	&& paxctl -cm /usr/bin/node \
