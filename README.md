@@ -8,14 +8,24 @@ on demand.
 
 There are various parts that you can define when building your image:
 
- * `VERSION` - The _Nodejs_ version number; Default: `5.6.0`
- * `NPM` - Set to "yes" (or whatever) if you want to install _npm_ as well; Default: `yes`
- * `NPM_VERSION` - Define the _npm_ version you want to install; Default: `3.6.0`
- * `PREFIX` - The `--prefix` for installing _Nodejs_ and _npm_; Default: `/usr`
- * `FLAGS` - Any additional flags you want to pass to the `configure` call when building _Nodejs_; Default: none
- * `TARGET` - The installation target, prefixed by `PREFIX`, so please leave that off; Default: `${PREFIX}/lib/app`
- * `SRC` - From where to fetch the original files for the `ONBUILD` commands; Default: `./app`; **Note** will probably get removed
- * `ADDT_PACKAGES` - Additional packages for Alpine, set for e.g. `wget` here; Default: none
+ * `VERSION` - The _Nodejs_ version number; 
+ Default: `5.6.0`
+ * `NPM` - Set to "yes" (or whatever) if you want to install _npm_ as well; 
+ Default: `yes`
+ * `NPM_VERSION` - Define the _npm_ version you want to install; 
+ Default: `3.6.0`
+ * `PREFIX` - The `--prefix` for installing _Nodejs_ and _npm_; 
+ Default: `/usr`
+ * `FLAGS` - Any additional flags you want to pass to the `configure` call when building _Nodejs_; 
+ Default: none, but [due to a bug](https://github.com/nodejs/node-v0.x-archive/wiki/statically-linked-executable), 
+ `--fully-static` will be removed even if set.
+ * `TARGET` - The installation target, prefixed by `PREFIX`, so please leave that off; 
+ Default: `${PREFIX}/lib/app`
+ * `SRC` - From where to fetch the original files for the `ONBUILD` commands; 
+ Default: `./app`; **Note** will probably get removed
+ * `ADDT_PACKAGES` - Additional (permanent) packages from the Alpine OS package repository, 
+ set for e.g. `wget` or `nano` here; 
+ Default: none
 
 ### Security
 
