@@ -1,15 +1,19 @@
 ---
 language: ruby
 
+sudo: required
+
 cache:
     - bundler
-
-sudo: false
 
 rvm:
     - 2.3.0
 
-gemfile: tests/Gemfile.ci
+gemfile: ./ci/Gemfile.ci
+
+env:
+  - DOCKER_VERSION=1.9.1
+  - DOCKER_VERSION=1.10.2
 
 services:
     - docker
@@ -18,4 +22,10 @@ branches:
     only:
         - master
 
-script: "bundle exec rspec -f p tests/Dockspec.rb"
+before_install: ./ci/install_dependencies.sh
+
+before_script:
+    - export PATH=/opt/docker:$PATH
+    - docker version
+
+script: "bundle exec rspec ./Dockspec.rb"

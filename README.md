@@ -8,14 +8,24 @@ on demand.
 
 There are various parts that you can define when building your image:
 
- * `VERSION` - The _Nodejs_ version number; Default: `5.6.0`
- * `NPM` - Set to "yes" (or whatever) if you want to install _npm_ as well; Default: `yes`
- * `NPM_VERSION` - Define the _npm_ version you want to install; Default: `3.6.0`
- * `PREFIX` - The `--prefix` for installing _Nodejs_ and _npm_; Default: `/usr`
- * `FLAGS` - Any additional flags you want to pass to the `configure` call when building _Nodejs_; Default: none
- * `TARGET` - The installation target, prefixed by `PREFIX`, so please leave that off; Default: `${PREFIX}/lib/app`
- * `SRC` - From where to fetch the original files for the `ONBUILD` commands; Default: `./app`; **Note** will probably get removed
- * `ADDT_PACKAGES` - Additional packages for Alpine, set for e.g. `wget` here; Default: none
+ * `VERSION` - The _Nodejs_ version number; 
+ Default: `5.6.0`
+ * `NPM` - Set to "yes" (or whatever) if you want to install _npm_ as well; 
+ Default: `yes`
+ * `NPM_VERSION` - Define the _npm_ version you want to install; 
+ Default: `3.6.0`
+ * `PREFIX` - The `--prefix` for installing _Nodejs_ and _npm_; 
+ Default: `/usr`
+ * `FLAGS` - Any additional flags you want to pass to the `configure` call when building _Nodejs_; 
+ Default: none, but [due to a bug](https://github.com/nodejs/node-v0.x-archive/wiki/statically-linked-executable), 
+ `--fully-static` will be removed even if set.
+ * `TARGET` - The installation target, prefixed by `PREFIX`, so please leave that off; 
+ Default: `${PREFIX}/lib/app`
+ * `SRC` - From where to fetch the original files for the `ONBUILD` commands; 
+ Default: `./app`; **Note** will probably get removed
+ * `ADDT_PACKAGES` - Additional (permanent) packages from the Alpine OS package repository, 
+ set for e.g. `wget` or `nano` here; 
+ Default: none
 
 ### Security
 
@@ -88,12 +98,45 @@ services:
         tty: true
 
 volumes:
-	…
+	nodeapp:
 
 networks:
     front:
         driver: bridge
 ```
+
+You can then check your attached volume:
+
+```shell
+$ docker volume ls
+local    projectname_nodeapp
+```
+
+In case you need to remove your volume container:
+
+```shell
+docker volume rm $(docker volume ls |awk '{print $2}')
+```
+
+Details about the volume are then available via:
+
+```shell
+docker volume inspect <volume_name>
+
+# Example:
+$ docker volume inspect projectname_nodeapp
+
+[
+    {
+        "Name"       : "projectname_nodeapp",
+        "Driver"     : "local",
+        "Mountpoint" : "/mnt/sda1/var/lib/docker/volumes/projectname_nodeapp/_data"
+    }
+]
+```
+
+**Sidenote:** You might want to `docker-compose down` your Nodejs service 
+to get a fresh start before going to create volumes.
 
 ### FAQ
 
@@ -127,18 +170,40 @@ when trying to build the image.
 use `--build-arg NPM="true"` (or better: `yes`) instead to avoid using a _real_ boolen. 
 The same has to be done when using _Docker Compose_. Set `build: args: NPM: "yes"` as _string_.
 
+## Tests
+
+Currently there are acceptance tests shipped with this package. The specs 
+are run using Ruby and the following Gems:
+
+ * [rspec](https://rubygems.org/gems/rspec)
+ * [serverspec](https://rubygems.org/gems/serverspec)
+ * [docker-api](https://rubygems.org/gems/docker-api)
+
+To run tests, you need Ruby and the listed Gems installed. The test can 
+be run on the command line:
+
+```shell
+$ Print progress bar/dots while running tests
+$ rspec --format progress Dockspec.rb
+# Short notation
+$ rspec -f p Dockspec.rb
+# Verbose output (Print spec titles) while running tests
+$ rspec --format documentation Dockspec.rb
+# Short notation
+$ rspec -f d Dockspec.rb
+```
+
+The _docker-api_ Gem will remote execute Docker, which means that the test run 
+is a real world test and will fully expose things that might go wrong.
+
+**OS X** and **Windows** users will have to run the tests inside their Docker Machine.
+
 ## TO-DO
 
 The build is currently not running smoothly. There are some things that need fixing. 
 If you can help, please open an issue, to discuss any idea you have in mind. If that 
 results in a pull request, I am happy to give you AAA-access to this repo. Please take a 
 quick look at [CONTRIBUTING](CONTRIBUTING.md) - you will not find any surprises there. 
-
- * In some cases there are libstdc++ and libgcc errors happening.
- 
-        Error loading shared library libstdc++.so.6: No such file or directory (needed by /usr/bin/node)
-        …
-        Error relocating /usr/bin/node: …
 
  * Nodejs probably shouldn't run as `root` on this machine. When everything works as `root`, 
  there should be a non privileged `node` user in place. See uncommented parts of the [`Dockerfile`](Dockerfile)

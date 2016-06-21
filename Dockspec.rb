@@ -2,16 +2,21 @@ require "serverspec"
 require "docker"
 
 describe "Dockerfile" do
-	before(:all) do
+
 	before( :all ) do
 		print "Running Tests for Docker\n"
 		print " ---> Docker Version " + Docker.version["Version"] + "\n\n"
 
-		@image = Docker::Image.build_from_dir( "../" )
+		print " ---> Building Docker Image\n\n"
+		@image = Docker::Image.build_from_dir( "." ) do |v|
+			if (log = JSON.parse(v)) && log.has_key?("stream")
+				$stdout.puts log["stream"]
+			end
+		end
 
 		set :os, family: :alpine
 		set :backend, :docker
-		set :docker_image, image.id
+		set :docker_image, @image.id
 
 		@container = Docker::Container.create(
 			'Image' => @image.id,
@@ -20,8 +25,9 @@ describe "Dockerfile" do
 		@container.start
 
 		print " ---> Details\n"
+
 		print "  OS: " + host_inventory["platform"]
-			print " " + host_inventory["platform_version"] + "\n"
+		print "      " + host_inventory["platform_version"] + "\n"
 		print "  Docker Container: " + host_inventory["hostname"] + "\n"
 		print "  Memory: " + host_inventory["memory"]["total"] + "\n\n"
 
@@ -69,4 +75,5 @@ describe "Dockerfile" do
 	def os_version
 		command( "identify_alpine()" ).stdout
 	end
+
 end
