@@ -7,7 +7,12 @@ describe "Dockerfile" do
 		print "Running Tests for Docker\n"
 		print " ---> Docker Version " + Docker.version["Version"] + "\n\n"
 
-		@image = Docker::Image.build_from_dir( "." )
+		print " ---> Building Docker Image\n\n"
+		@image = Docker::Image.build_from_dir( "." ) do |v|
+			if (log = JSON.parse(v)) && log.has_key?("stream")
+				$stdout.puts log["stream"]
+			end
+		end
 
 		set :os, family: :alpine
 		set :backend, :docker
@@ -20,6 +25,7 @@ describe "Dockerfile" do
 		@container.start
 
 		print " ---> Details\n"
+
 		print "  OS: " + host_inventory["platform"]
 		print "      " + host_inventory["platform_version"] + "\n"
 		print "  Docker Container: " + host_inventory["hostname"] + "\n"
