@@ -205,12 +205,6 @@ If you can help, please open an issue, to discuss any idea you have in mind. If 
 results in a pull request, I am happy to give you AAA-access to this repo. Please take a 
 quick look at [CONTRIBUTING](CONTRIBUTING.md) - you will not find any surprises there. 
 
- * In some cases there are libstdc++ and libgcc errors happening.
- 
-        Error loading shared library libstdc++.so.6: No such file or directory (needed by /usr/bin/node)
-        …
-        Error relocating /usr/bin/node: …
-
  * Nodejs probably shouldn't run as `root` on this machine. When everything works as `root`, 
  there should be a non privileged `node` user in place. See uncommented parts of the [`Dockerfile`](Dockerfile)
  * Maybe there should be an [`ENTRYPOINT`](docker-entrypoint.sh) in place to pass commands directly 
