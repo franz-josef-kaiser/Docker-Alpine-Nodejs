@@ -11,10 +11,11 @@ describe "Dockerfile" do
 		print " ---> Docker Version " + Docker.version["Version"] + "\n\n"
 
 		print " ---> Building Docker Image\n\n"
-		# Fetch existing image
-		@image = Docker::Image.get( "nodejs:latest" );
-		# If it does not exist, build it
-		if @image == nil
+		begin
+			# Fetch existing image
+			@image = Docker::Image.get( "nodejs:latest" )
+		rescue
+			# If it does not exist, build it
 			@image = Docker::Image.build_from_dir( ".", "t" => "nodejs:test" ) do |v|
 				if ( log = JSON.parse(v) ) && log.has_key?( "stream" )
 					$stdout.puts log["stream"]
