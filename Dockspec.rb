@@ -32,7 +32,7 @@ describe "Dockerfile" do
 
 		@container = Docker::Container.create(
 			'Image' => @image.id,
-			'Cmd'   => [ "node -v" ]
+			'Cmd'   => [ "node", "-v" ]
 		)
 		@container.start
 
