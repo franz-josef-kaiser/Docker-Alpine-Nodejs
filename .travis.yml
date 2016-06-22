@@ -22,6 +22,7 @@ services:
 branches:
     only:
         - master
+        - dev
 
 before_install: ./ci/install_dependencies.sh
 
