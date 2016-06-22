@@ -16,12 +16,15 @@ describe "Dockerfile" do
 			@image = Docker::Image.get( "nodejs:latest" )
 		rescue
 			# If it does not exist, build it
-			@image = Docker::Image.build_from_dir( ".", "t" => "nodejs:test" ) do |v|
-				if ( log = JSON.parse(v) ) && log.has_key?( "stream" )
+			@image = Docker::Image.build_from_dir( ".", "t" => "nodejs:test" ) do |img|
+				if ( log = JSON.parse( img ) ) && log.has_key?( "stream" )
 					$stdout.puts log["stream"]
 				end
 			end
 		end
+		print " ---> Image Details:\n"
+		puts @image.inspect
+		puts ""
 
 		set :os, family: :alpine
 		set :backend, :docker
@@ -49,7 +52,7 @@ describe "Dockerfile" do
 		@container.stop
 		@container.kill
 		@container.delete( :force => true )
-		#@image.remove( :force => true )
+		@image.remove( :force => true )
 	end
 
 
