@@ -13,7 +13,8 @@ gemfile: ./ci/Gemfile.ci
 
 env:
   - DOCKER_VERSION=1.9.1
-  - DOCKER_VERSION=1.10.2
+  - DOCKER_VERSION=1.10.3
+  - DOCKER_VERSION=1.11.2
 
 services:
     - docker

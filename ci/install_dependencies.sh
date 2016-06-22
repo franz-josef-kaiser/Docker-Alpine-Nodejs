@@ -21,7 +21,7 @@ do
     sudo /opt/docker/docker daemon -D &
     DOCKER_PID=$!
     sleep 5
-    echo "Checking if docker is running"
-    ps -p $DOCKER_PID && running=1 || echo "Couldn't start docker, retrying"
+    echo " ---> Checking if docker is running \n"
+    ps -p $DOCKER_PID && running=1 || echo "\nCouldn't start docker, retrying…\n"
 done
-echo "Docker running, continuing"
+echo " ---> Docker running, continuing\n\n"
