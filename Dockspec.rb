@@ -18,7 +18,8 @@ describe "Dockerfile" do
 			# If it does not exist, build it
 			@image = Docker::Image.build_from_dir( ".", "t" => "nodejs:test" ) do |v|
 				if ( log = JSON.parse(v) ) && log.has_key?( "stream" )
-					$stdout.puts log["stream"]
+					# Only enable for debugging
+					#$stdout.puts log["stream"]
 				end
 			end
 		end
@@ -44,7 +45,7 @@ describe "Dockerfile" do
 	end
 
 	after( :all ) do
-		print "\n\n ---> Cleaning up. Removing container."
+		print "\n\n ---> Cleaning up. Removing container.\n"
 
 		@container.stop
 		@container.kill
