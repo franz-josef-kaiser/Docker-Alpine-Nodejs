@@ -5,13 +5,13 @@ MAINTAINER Franz Josef Kaiser <wecodemore@gmail.com>
 
 # User defined build variables
 ARG VERSION
-ENV VERSION ${VERSION:-5.6.0}
+ENV VERSION ${VERSION:-6.9.5}
 
 ARG NPM
 ENV NPM ${NPM:-yes}
 
 ARG NPM_VERSION
-ENV NPM_VERSION ${NPM_VERSION:-3.6.0}
+ENV NPM_VERSION ${NPM_VERSION:-3.10.10}
 
 ENV USER node
 
