@@ -1,7 +1,7 @@
 #@IgnoreInspection BashAddShebang
-FROM alpine:edge
+FROM alpine:latest
 
-# MAINTAINER Franz Josef Kaiser <wecodemore@gmail.com>
+MAINTAINER Franz Josef Kaiser <wecodemore@gmail.com>
 
 # User defined build variables
 ARG VERSION
@@ -44,6 +44,8 @@ ENV PACKAGES "binutils-gold \
 	gcc \
 	gnupg \
 	linux-headers \
+	paxctl \
+	paxmark \
 	make \
 	python"
 
@@ -55,6 +57,8 @@ ENV DEPS_PACKAGES "libgcc \
 	libstdc++ \
 	${ADDT_PACKAGES}"
 
+# Keys for verification can be found in the official repo
+# @link https://github.com/nodejs/node#release-team
 ENV GPG_KEYS \
 	94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
 	0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
@@ -68,6 +72,7 @@ ENV GPG_KEYS \
 	114F43EE0176B71C7BC219DD50A3051F888C628D \
 	7937DFD2AB06298B2293C3187D33FF9D0246406D
 
+# Add the prebuilt public keyring and trust db, so unavailable keyservers do not hurt
 ADD ./keys /root/.gnupg
 
 WORKDIR "${TARGET}"
@@ -79,18 +84,17 @@ WORKDIR "${TARGET}"
 #    In a previous version, the keys were fetched from a keyserver, which is as reliable as the
 #    keyservers-which they are not: gpg --keyserver pool.sks-keyservers.net --recv-keys "${key}";
 # 3. Build Nodejs using Gnu C Compiler/gcc ia Make using max available amount of CPUs, default to 1
-#    Node.js needs to execute arbitrary code at runtime. Permit this by disabling mprotect: Grsecurity + paxctl.
+#    Node.js needs to execute arbitrary code at runtime.
+#    Permit this by disabling mprotect: Grsecurity + paxctl.
+#    @link https://en.wikibooks.org/wiki/Grsecurity/Application-specific_Settings#Node.js
 # 4. Test the Node.js build and finished installation, Install NPM globally - if requested
 # 5. Finally install NPM on demand.
 # 6. Clean up temporary files, packages that aren't needed anymore, Remove Man pages, etc.
-RUN apk update \
-	&& apk add --upgrade --no-cache ${PACKAGES} ${DEPS_PACKAGES} \
+RUN apk add --update --no-cache ${PACKAGES} ${DEPS_PACKAGES} \
 	&& chmod -R 0600 /root/.gnupg \
 	&& update-ca-certificates --fresh \
+	&& gpg --list-keys \
 	&& set -xe \
-	&& for file in /root/.gnupg/*.asc; do \
-			gpg --import "${file}"; \
-		done \
 	&& for key in ${GPG_KEYS}; do \
 			gpg --fingerprint "${key}"; \
 		done \
