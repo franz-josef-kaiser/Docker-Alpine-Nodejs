@@ -18,7 +18,7 @@ describe 'Docker image specs' do
 			@image = Docker::Image.build_from_dir( '.', 't' => 'nodejs:latest' ) do |v|
 				if ( log = JSON.parse(v) ) && log.has_key?( 'stream' )
 					# Only enable for debugging
-					# $stdout.puts log['stream']
+					$stdout.puts log['stream']
 				end
 			end
 		end
