@@ -46,8 +46,7 @@ ENV PACKAGES "binutils-gold \
 	linux-headers \
 	paxctl \
 	make \
-	python \
-	tini"
+	python"
 
 # Alpine APK registry packages
 # Custom, user defined runtime packages, allowing for extensions
@@ -55,6 +54,7 @@ ARG ADDT_PACKAGES
 # Packages mandatory to run Nodejs
 ENV DEPS_PACKAGES "libgcc \
 	libstdc++ \
+	tini \
 	${ADDT_PACKAGES}"
 
 # Keys for verification can be found in the official repo
@@ -180,4 +180,4 @@ EXPOSE 3000
 #ENTRYPOINT [ "/entrypoint.sh" ]
 
 # Default command
-CMD [ "node", "-v" ]
+CMD [ "node" ]

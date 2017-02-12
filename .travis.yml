@@ -4,29 +4,29 @@ language: ruby
 sudo: required
 
 cache:
-    - bundler
+  - bundler
 
 rvm:
-    - 2.3.0
+  - 2.3.0
 
 gemfile: ./ci/Gemfile.ci
 
 env:
-  - DOCKER_VERSION=1.9.1
   - DOCKER_VERSION=1.10.3
   - DOCKER_VERSION=1.11.2
+  - DOCKER_VERSION=1.13.1
 
 services:
-    - docker
+  - docker
 
 branches:
-    only:
-        - master
+  only:
+    - master
 
 before_install: ./ci/install_dependencies.sh
 
 before_script:
-    - export PATH=/opt/docker:$PATH
-    - docker version
+  - export PATH=/opt/docker:$PATH
+  - docker version
 
 script: "bundle exec rspec ./Dockspec.rb"
