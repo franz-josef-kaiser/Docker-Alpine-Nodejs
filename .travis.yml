@@ -25,4 +25,6 @@ before_script:
   - export PATH=/opt/docker:$PATH
   - docker version
 
-script: "bundle exec rspec ./Dockspec.rb"
+script:
+  - bundle exec rspec ./Dockspec.rb
+  - docker run --entrypoint=/bin/sh nodejs:latest -c 'du -s / 2>/dev/null | cut -f1'

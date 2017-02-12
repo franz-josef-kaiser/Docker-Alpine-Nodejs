@@ -36,11 +36,15 @@ describe 'Docker image specs' do
 		)
 		@container.start()
 
+		print " ---> Container Details:\n"
+		puts @container.json
+		puts ""
+
 		@docker = Docker
 
-		print " ---> Details\n"
-		print "  Host-Memory: " + ( Docker.info['MemTotal'] / 1024 / 1024 ).to_s + " MB\n"
-		print "  Container: " + Docker.info['OperatingSystem'] + "\n\n"
+		print " ---> Details: Host\n"
+		print "  Memory: " + ( Docker.info['MemTotal'] / 1024 / 1024 ).to_s + " MB\n"
+		print "  OS: " + Docker.info['OperatingSystem'] + "\n\n"
 	end
 
 	after( :all ) do
@@ -66,7 +70,7 @@ describe 'Docker image specs' do
 		end
 
 		it 'should have all needed ENV variables set' do
-			env = @image.info['Config']['Env']
+			env = @container.json['Config']['Env']
 			expect( env ).to be_a( Array )
 
 			# Convert to Hash so we can check ENV var existence
