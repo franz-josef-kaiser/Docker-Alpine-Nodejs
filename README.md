@@ -1,8 +1,6 @@
 # Docker + Node.js + npm (optional) + Alpine Linux
 
 [![Build Status](https://travis-ci.org/franz-josef-kaiser/Docker-Alpine-Nodejs.svg?branch=master)](https://travis-ci.org/franz-josef-kaiser/Docker-Alpine-Nodejs)
-
-[![Stories in Progress](https://badge.waffle.io/franz-josef-kaiser/filterama.png?label=ready&title=Progress)](https://waffle.io/franz-josef-kaiser/filterama)
 [![Stories in Ready](https://badge.waffle.io/franz-josef-kaiser/filterama.png?label=ready&title=Ready)](https://waffle.io/franz-josef-kaiser/filterama)
 
 Builds a small and highly versatile Docker container, running Alpine Linux OS edge version 

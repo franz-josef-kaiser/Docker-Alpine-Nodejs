@@ -15,13 +15,22 @@ describe 'Docker image specs' do
 		rescue
 			print " … Building Docker Image\n\n"
 			# If it does not exist, build it
+<<<<<<< HEAD
+			@image = Docker::Image.build_from_dir( ".", "t" => "nodejs:test" ) do |img|
+				if ( log = JSON.parse( img ) ) && log.has_key?( "stream" )
+					$stdout.puts log["stream"]
+=======
 			@image = Docker::Image.build_from_dir( '.', 't' => 'nodejs:latest' ) do |v|
 				if ( log = JSON.parse(v) ) && log.has_key?( 'stream' )
 					# Only enable for debugging
 					# $stdout.puts log['stream']
+>>>>>>> dev
 				end
 			end
 		end
+		print " ---> Image Details:\n"
+		puts @image.inspect
+		puts ""
 
 		set :os, family: :alpine
 		set :backend, :docker
@@ -30,7 +39,11 @@ describe 'Docker image specs' do
 		print " … Creating Docker container\n\n"
 		@container = Docker::Container.create(
 			'Image' => @image.id,
+<<<<<<< HEAD
+			'Cmd'   => [ "node", "-v" ]
+=======
 			'Cmd'   => [ 'true' ]
+>>>>>>> dev
 		)
 		@container.start()
 
@@ -47,6 +60,10 @@ describe 'Docker image specs' do
 		@container.stop()
 		@container.kill()
 		@container.delete( :force => true )
+<<<<<<< HEAD
+		@image.remove( :force => true )
+=======
+>>>>>>> dev
 	end
 
 	describe command( 'cat /etc/alpine-release' ) do
