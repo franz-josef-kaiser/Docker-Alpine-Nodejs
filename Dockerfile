@@ -150,8 +150,6 @@ RUN apk add --update --no-cache ${PACKAGES} ${DEPS_PACKAGES} \
 		/usr/lib/node_modules/npm/scripts \
 		/usr/lib/node_modules/npm/html
 
-# && curl -L https://npmjs.org/install.sh | sh \
-
 # Add group, Add no-pass user and assign to group, recursively own the target dir
 RUN addgroup ${USER} \
 	&& adduser -S ${USER} -D -G ${USER}
@@ -172,12 +170,6 @@ WORKDIR "${TARGET}"
 #ONBUILD RUN [[ -z "${NPM}" ]] || $(npm install)
 
 EXPOSE 3000
-
-# The image name can double as a reference to the binary
-# $ docker run nodejs
-#COPY docker-entrypoint.sh /entrypoint.sh
-#RUN chmod +x /entrypoint.sh
-#ENTRYPOINT [ "/entrypoint.sh" ]
 
 # Default command
 CMD [ "node" ]
