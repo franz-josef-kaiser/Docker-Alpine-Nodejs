@@ -1,17 +1,17 @@
 #@IgnoreInspection BashAddShebang
-FROM alpine:edge
+FROM alpine:latest
 
 MAINTAINER Franz Josef Kaiser <wecodemore@gmail.com>
 
 # User defined build variables
 ARG VERSION
-ENV VERSION ${VERSION:-5.6.0}
+ENV VERSION ${VERSION:-6.9.5}
 
 ARG NPM
 ENV NPM ${NPM:-yes}
 
 ARG NPM_VERSION
-ENV NPM_VERSION ${NPM_VERSION:-3.6.0}
+ENV NPM_VERSION ${NPM_VERSION:-3.10.10}
 
 ENV USER node
 
@@ -44,8 +44,8 @@ ENV PACKAGES "binutils-gold \
 	gcc \
 	gnupg \
 	linux-headers \
-	make \
 	paxctl \
+	make \
 	python"
 
 # Alpine APK registry packages
@@ -54,19 +54,26 @@ ARG ADDT_PACKAGES
 # Packages mandatory to run Nodejs
 ENV DEPS_PACKAGES "libgcc \
 	libstdc++ \
+	tini \
 	${ADDT_PACKAGES}"
 
-ENV GPG_KEYS 9554F04D7259F04124DE6B476D5A82AC7E37093B \
-		94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
-		0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
-		FD3A5288F042B6850C66B31F09FE44734EB7990E \
-		71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
-		DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
-		C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
-		B9AE9905FFD7803F25714661B63B535A4C206CA9 \
-		93C7E9E91B49E432C2F75674B0A78B0A6C481CF6 \
-		114F43EE0176B71C7BC219DD50A3051F888C628D \
-		7937DFD2AB06298B2293C3187D33FF9D0246406D
+# Keys for verification can be found in the official repo
+# @link https://github.com/nodejs/node#release-team
+ENV GPG_KEYS \
+	94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
+	0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
+	FD3A5288F042B6850C66B31F09FE44734EB7990E \
+	71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
+	DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
+	C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
+	B9AE9905FFD7803F25714661B63B535A4C206CA9 \
+	9554F04D7259F04124DE6B476D5A82AC7E37093B \
+	93C7E9E91B49E432C2F75674B0A78B0A6C481CF6 \
+	114F43EE0176B71C7BC219DD50A3051F888C628D \
+	7937DFD2AB06298B2293C3187D33FF9D0246406D
+
+# Add the prebuilt public keyring and trust db, so unavailable keyservers do not hurt
+ADD ./keys /root/.gnupg
 
 WORKDIR "${TARGET}"
 
@@ -74,17 +81,21 @@ WORKDIR "${TARGET}"
 #    The keys contain the ones of three older Node.js maintainers as well to verify older versions integrity
 #    Verify .asc key file first, then verify tarball, then untar when everything went well
 # 2. Add Gnu Privacy Guard keys, check fingerprint
+#    In a previous version, the keys were fetched from a keyserver, which is as reliable as the
+#    keyservers-which they are not: gpg --keyserver pool.sks-keyservers.net --recv-keys "${key}";
 # 3. Build Nodejs using Gnu C Compiler/gcc ia Make using max available amount of CPUs, default to 1
-#    Node.js needs to execute arbitrary code at runtime. Permit this by disabling mprotect: Grsecurity + paxctl.
+#    Node.js needs to execute arbitrary code at runtime.
+#    Permit this by disabling mprotect: Grsecurity + paxctl.
+#    @link https://en.wikibooks.org/wiki/Grsecurity/Application-specific_Settings#Node.js
 # 4. Test the Node.js build and finished installation, Install NPM globally - if requested
 # 5. Finally install NPM on demand.
 # 6. Clean up temporary files, packages that aren't needed anymore, Remove Man pages, etc.
-RUN apk update \
-	&& apk add --upgrade --no-cache ${PACKAGES} ${DEPS_PACKAGES} \
+RUN apk add --update --no-cache ${PACKAGES} ${DEPS_PACKAGES} \
+	&& chmod -R 0600 /root/.gnupg \
 	&& update-ca-certificates --fresh \
+	&& gpg --list-keys \
 	&& set -xe \
 	&& for key in ${GPG_KEYS}; do \
-			gpg --keyserver pool.sks-keyservers.net --recv-keys "${key}"; \
 			gpg --fingerprint "${key}"; \
 		done \
 	&& echo " ---> Downloading Node.js tarball" \
@@ -140,18 +151,16 @@ RUN apk update \
 		/usr/lib/node_modules/npm/html
 
 # && curl -L https://npmjs.org/install.sh | sh \
-#VOLUME ${TARGET}
 
 # Add group, Add no-pass user and assign to group, recursively own the target dir
-#RUN addgroup ${USER} \
-#	&& adduser -S ${USER} -D -G ${USER} \
-#	&& chown -R ${USER}:${USER} ${TARGET}
+RUN addgroup ${USER} \
+	&& adduser -S ${USER} -D -G ${USER}
 
-#USER ${USER}
+USER ${USER}
 
-#ENV HOME /home/${USER}
+ENV HOME /home/${USER}
 
-#WORKDIR "${TARGET}"
+WORKDIR "${TARGET}"
 
 # Create App directory
 #ONBUILD RUN mkdir -p ${TARGET}
@@ -171,4 +180,4 @@ EXPOSE 3000
 #ENTRYPOINT [ "/entrypoint.sh" ]
 
 # Default command
-CMD [ "node", "-v" ]
+CMD [ "node" ]
