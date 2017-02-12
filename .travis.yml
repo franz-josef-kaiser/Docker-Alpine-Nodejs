@@ -7,7 +7,7 @@ cache:
   - bundler
 
 rvm:
-  - 2.3.0
+  - 2.3.1
 
 gemfile: ./ci/Gemfile.ci
 
