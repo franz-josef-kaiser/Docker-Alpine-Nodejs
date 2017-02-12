@@ -45,9 +45,9 @@ ENV PACKAGES "binutils-gold \
 	gnupg \
 	linux-headers \
 	paxctl \
-	paxmark \
 	make \
-	python"
+	python \
+	tini"
 
 # Alpine APK registry packages
 # Custom, user defined runtime packages, allowing for extensions
@@ -151,18 +151,16 @@ RUN apk add --update --no-cache ${PACKAGES} ${DEPS_PACKAGES} \
 		/usr/lib/node_modules/npm/html
 
 # && curl -L https://npmjs.org/install.sh | sh \
-#VOLUME ${TARGET}
 
 # Add group, Add no-pass user and assign to group, recursively own the target dir
-#RUN addgroup ${USER} \
-#	&& adduser -S ${USER} -D -G ${USER} \
-#	&& chown -R ${USER}:${USER} ${TARGET}
+RUN addgroup ${USER} \
+	&& adduser -S ${USER} -D -G ${USER}
 
-#USER ${USER}
+USER ${USER}
 
-#ENV HOME /home/${USER}
+ENV HOME /home/${USER}
 
-#WORKDIR "${TARGET}"
+WORKDIR "${TARGET}"
 
 # Create App directory
 #ONBUILD RUN mkdir -p ${TARGET}
