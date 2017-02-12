@@ -1,9 +1,11 @@
-# Docker + Node.js + npm (optional) + Alpine Linux
+<h1 style="text-align: center;">
+	Nodejs dockerized on Alpine OS
+</h1>
 
 [![Build Status](https://travis-ci.org/franz-josef-kaiser/Docker-Alpine-Nodejs.svg?branch=master)](https://travis-ci.org/franz-josef-kaiser/Docker-Alpine-Nodejs)
 [![Stories in Ready](https://badge.waffle.io/franz-josef-kaiser/filterama.png?label=ready&title=Ready)](https://waffle.io/franz-josef-kaiser/filterama)
 
-Builds a small and highly versatile Docker container, running Alpine Linux OS edge version 
+Builds a **small and highly versatile** Docker container, running **Alpine Linux OS** latest version 
 and Nodejs on top. Optional installation of npm and, depending on that, installs packages 
 on demand.
 
@@ -145,7 +147,7 @@ to get a fresh start before going to create volumes.
 
 **Q:** What is the license?
 
-**A:** MIT License (Expat). Short explanation: Basically, you can do whatever you 
+**A:** MIT License (Expat). **tl;dr**: Basically, you can do whatever you 
 want as long as you include the original copyright and license notice in any copy 
 of the software/source. [tl;dr](https://tldrlegal.com/license/mit-license). See 
 the attached license file in this repository for the full text.
