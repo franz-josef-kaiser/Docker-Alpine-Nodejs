@@ -21,7 +21,6 @@ branches:
   only:
     - master
 
-before_install: ./ci/install_dependencies.sh
 
 before_script:
   - export PATH=/opt/docker:$PATH
