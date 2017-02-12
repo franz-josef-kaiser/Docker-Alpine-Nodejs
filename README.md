@@ -1,4 +1,4 @@
-<h1 style="text-align: center;">
+<h1 align="center">
 	Nodejs dockerized on Alpine OS
 </h1>
 
