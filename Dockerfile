@@ -172,4 +172,4 @@ WORKDIR "${TARGET}"
 EXPOSE 3000
 
 # Default command
-CMD [ "node" ]
+CMD [ "/sbin/tini", "--", "node" ]

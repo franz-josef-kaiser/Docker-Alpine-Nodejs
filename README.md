@@ -36,6 +36,12 @@ There are various parts that you can define when building your image:
  set for e.g. `wget` or `nano` here; 
  Default: none
 
+As Nodejs was not designed to run with PID 1, this image uses 
+[tini](https://github.com/krallin/tini) as process reaper.
+
+> All Tini does is spawn a single child (Tini is meant to be run in a container), and wait for it 
+to exit all the while reaping zombies and performing signal forwarding.
+
 ### How To
 
 Images are highly versatile and can be customized, using above env variables.
