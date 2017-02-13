@@ -19,6 +19,8 @@ There are various parts that you can define when building your image:
  Default: `yes`
  * `NPM_VERSION` - Define the _npm_ version you want to install; 
  Default: `3.6.0`
+ * `NPM_NPM_CONFIG_LOGLEVEL` - Define the _npm_ log level for dev installs. For e.g. `info`. 
+ Default: `warn`
  * `PREFIX` - The `--prefix` for installing _Nodejs_ and _npm_; 
  Default: `/usr`
  * `FLAGS` - Any additional flags you want to pass to the `configure` call when building _Nodejs_; 
