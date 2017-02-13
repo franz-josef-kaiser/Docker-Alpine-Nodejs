@@ -65,10 +65,6 @@ describe 'Docker image specs' do
 			expect( @image.json['Config']['Cmd'] ).to include( 'node' )
 		end
 
-		#it 'should use Alpine OS' do
-		#	expect( @docker.info['OperatingSystem'] ).to include( 'Alpine Linux' )
-		#end
-
 		it 'should have all needed ENV variables set' do
 			env = @container.json['Config']['Env']
 			expect( env ).to be_a( Array )
@@ -83,6 +79,7 @@ describe 'Docker image specs' do
 			expect( envars ).to include( 'VERSION' )
 			expect( envars ).to include( 'NPM' )
 			expect( envars ).to include( 'NPM_VERSION' )
+			expect( envars ).to include( 'NPM_CONFIG_LOGLEVEL' )
 			expect( envars ).to include( 'FLAGS' )
 
 			expect( envars ).to include( 'HOME' )
