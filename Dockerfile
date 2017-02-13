@@ -13,6 +13,9 @@ ENV NPM ${NPM:-yes}
 ARG NPM_VERSION
 ENV NPM_VERSION ${NPM_VERSION:-3.10.10}
 
+ARG NPM_CONFIG_LOGLEVEL
+ENV NPM_CONFIG_LOGLEVEL ${NPM_CONFIG_LOGLEVEL:-warn}
+
 ENV USER node
 
 # The base directory
@@ -172,4 +175,4 @@ WORKDIR "${TARGET}"
 EXPOSE 3000
 
 # Default command
-CMD [ "node" ]
+CMD [ "/sbin/tini", "--", "node" ]

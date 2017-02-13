@@ -1,4 +1,4 @@
-<h1 style="text-align: center;">
+<h1 align="center">
 	Nodejs dockerized on Alpine OS
 </h1>
 
@@ -12,6 +12,10 @@ on demand.
 ### Configuration
 
 There are various parts that you can define when building your image:
+
+    docker build -t nodejs:custom 
+
+**`ENV` variables:**
 
  * `VERSION` - The _Nodejs_ version number; 
  Default: `5.6.0`
@@ -34,24 +38,15 @@ There are various parts that you can define when building your image:
  set for e.g. `wget` or `nano` here; 
  Default: none
 
-### Security
+As Nodejs was not designed to run with PID 1, this image uses 
+[tini](https://github.com/krallin/tini) as process reaper.
 
-**OS** Alpine Linux has a very small foot print and therefore only a tiny attack surface. 
-In addition, it features SELinux for enhanced security. Still it is recommended to 
-have a firewall, proxy or load balancer in front of your Node servers to not expose 
-them directly to the public.
-
-**Packages** The download gets verified using _GNU Privacy Guard_/gpg. That means that 
-if the source repo should get compromised, the build will fail with the 
-following message:
-
-```shell
-node-v5.6.0.tar.gz: FAILED
-sha256sum: WARNING: 1 of 1 computed checksums did NOT match
-```
+> All Tini does is spawn a single child (Tini is meant to be run in a container), and wait for it 
+to exit all the while reaping zombies and performing signal forwarding.
 
 ### How To
 
+Images are highly versatile and can be customized, using above env variables.
 Build the image on the command line (assuming the `Dockerfile` is in a subfolder):
 
     docker build -t nodejs:latest ./Docker/Nodejs/
@@ -64,6 +59,8 @@ both the Node and NPM version, you have to use the `--build-arg` flag:
 Development builds should be done without cache:
 
     docker build --no-cache -t nodejs:dev ./Docker/Nodejs/
+
+### Docker Compose
 
 Docker Compose Example:
 
@@ -86,26 +83,24 @@ services:
         expose:
             - "3000"
         depends_on:
-            - nodeapp
+            - app
         volumes_from:
-            - nodeapp
+            - app
         command: [ "node", "server.js" ]
         #command: npm install --force --loglevel=error
         networks:
             - front
-        tty: true
 
-    nodeapp:
-        container_name: nodeapp
+    app:
+        container_name: app
         image: busybox:latest
         volumes:
             - ./app/node:/usr/src/app
         networks:
             - front
-        tty: true
 
 volumes:
-	nodeapp:
+	eapp:
 
 networks:
     front:
@@ -116,7 +111,7 @@ You can then check your attached volume:
 
 ```shell
 $ docker volume ls
-local    projectname_nodeapp
+local    projectname_app
 ```
 
 In case you need to remove your volume container:
@@ -131,13 +126,13 @@ Details about the volume are then available via:
 docker volume inspect <volume_name>
 
 # Example:
-$ docker volume inspect projectname_nodeapp
+$ docker volume inspect projectname_app
 
 [
     {
-        "Name"       : "projectname_nodeapp",
+        "Name"       : "projectname_app",
         "Driver"     : "local",
-        "Mountpoint" : "/mnt/sda1/var/lib/docker/volumes/projectname_nodeapp/_data"
+        "Mountpoint" : "/mnt/sda1/var/lib/docker/volumes/projectname_app/_data"
     }
 ]
 ```
@@ -203,7 +198,31 @@ $ rspec -f d Dockspec.rb
 The _docker-api_ Gem will remote execute Docker, which means that the test run 
 is a real world test and will fully expose things that might go wrong.
 
-**OS X** and **Windows** users will have to run the tests inside their Docker Machine.
+**macOS** users can run the tests inside the terminal when they have the docker 
+status bar app installed (running Hypervisor)
+**Windows** and older **OS X** users will have to run the tests inside their Docker Machine.
+
+### Security
+
+**OS** Alpine Linux has a very small foot print and therefore only a tiny attack surface. 
+In addition, it features SELinux for enhanced security. Still it is recommended to 
+have a firewall, proxy or load balancer in front of your Node servers to not expose 
+them directly to the public.
+
+**Packages** The download gets verified using _GNU Privacy Guard_/gpg. That means that 
+if the source repo should get compromised, the build will fail with the 
+following message:
+
+```shell
+node-v5.6.0.tar.gz: FAILED
+sha256sum: WARNING: 1 of 1 computed checksums did NOT match
+```
+
+The repo itself comes with a prepackaged public keyring, containing all current and 
+previous contributors. The validity and integrity of the Nodejs download will be verified
+using this trust database. This is to work around unreliable key servers. If you want to 
+take a look at the keys, check the `Dockerfile`, where you will find a `GPG_KEYS` 
+env variable containing them all.
 
 ## TO-DO
 
@@ -212,10 +231,10 @@ If you can help, please open an issue, to discuss any idea you have in mind. If 
 results in a pull request, I am happy to give you AAA-access to this repo. Please take a 
 quick look at [CONTRIBUTING](CONTRIBUTING.md) - you will not find any surprises there. 
 
- * Nodejs probably shouldn't run as `root` on this machine. When everything works as `root`, 
- there should be a non privileged `node` user in place. See uncommented parts of the [`Dockerfile`](Dockerfile)
- * Maybe there should be an [`ENTRYPOINT`](docker-entrypoint.sh) in place to pass commands directly 
- to `npm` and avoid fiddling with `node`.
- * The file removal after the installation of NPM could be much easier and just set a whitelist.
+ * [x] ~~Nodejs probably shouldn't run as `root` on this machine. When everything works as `root`, 
+ there should be a non privileged `node` user in place. See uncommented parts of the [`Dockerfile`](Dockerfile).~~
+ * [x] ~~Maybe there should be an [`ENTRYPOINT`](docker-entrypoint.sh) in place to pass commands directly 
+ to `npm` and avoid fiddling with `node`.~~
+ * [ ] The file removal after the installation of NPM could be much easier and just set a whitelist.
  That would also mean that it's more versatile regarding the folder structure of various versions.
  Also we need to check the folder structure first and maybe switch the whitelist depending on the version.
